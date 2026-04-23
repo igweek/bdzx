@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/data", "destination": "/data/index.html" },
+    { "source": "/glsl", "destination": "/glsl/index.html" },
+    { "source": "/hdpj", "destination": "/hdpj/index.html" },
+    { "source": "/sjsl", "destination": "/sjsl/index.html" },
+    { "source": "/yolo", "destination": "/yolo/index.html" }
+  ]
+}
