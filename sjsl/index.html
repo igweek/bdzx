@@ -6,145 +6,138 @@
     <title>大闸蟹智能投喂模型</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .edge { transition: stroke 0.3s ease, stroke-width 0.3s ease; }
         .node-rect { transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease; }
         .node-text { transition: fill 0.3s ease, font-weight 0.3s ease; }
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: currentColor;
-            cursor: pointer;
-            margin-top: -6px;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            cursor: pointer;
-            background: #e2e8f0;
-            border-radius: 2px;
-        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans p-6 md:p-12 overflow-x-hidden min-h-screen">
+<body class="bg-slate-50 text-slate-800 font-sans p-6 md:p-12 overflow-x-hidden">
 
-<div class="max-w-7xl mx-auto space-y-12">
-    <header class="space-y-4 text-center mb-8">
-    </header>
-
+<div class="max-w-[1400px] mx-auto space-y-8">
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <!-- Input & Controls Section -->
         <div class="xl:col-span-3 space-y-6">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative overflow-hidden h-full">
-                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
-                <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 mb-6">
-                    <i data-lucide="settings" class="text-cyan-500 w-5 h-5"></i> 交互控制台
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-md relative overflow-hidden flex flex-col h-full">
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-400 to-cyan-400"></div>
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 mb-4">
+                    <i data-lucide="activity" class="text-blue-500 w-5 h-5"></i> 实时数据监控
                 </h2>
-                <div class="space-y-8">
+                
+                <div class="space-y-6 flex-1">
                     <div>
-                        <h3 class="text-xs font-medium text-slate-400 mb-4 tracking-wider uppercase">环境特征探测器</h3>
-
-                        <div class="mb-4 group text-sm" style="color: #3b82f6;">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-medium text-slate-500 flex items-center gap-1.5 transition-colors group-hover:text-slate-700">
-                                    <span class="p-1 rounded bg-slate-100 text-blue-500"><i data-lucide="thermometer" class="w-3.5 h-3.5"></i></span>
-                                    水温 (°C)
-                                </label>
-                                <span id="val_temp" class="text-xs font-mono font-medium px-2 py-0.5 rounded border border-slate-200 bg-slate-50 transition-colors text-blue-500">24</span>
-                            </div>
-                            <input type="range" id="temp" min="10" max="35" step="0.5" value="24" class="text-blue-500" oninput="updateValues()">
+                        <h3 class="text-xs font-bold text-slate-400 mb-4 tracking-wider uppercase">环境特征探测器</h3>
+                        
+                        <div class="mb-5 flex justify-between items-center group">
+                            <label class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                <span class="p-1.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100"><i data-lucide="thermometer" class="w-4 h-4"></i></span>
+                                水温
+                            </label>
+                            <span class="text-sm font-mono font-bold px-2 py-1 rounded-md border border-blue-200 bg-blue-50 text-blue-700 shadow-sm min-w-[70px] text-right">
+                                <span id="val_temp">24.0</span> <span class="text-[10px] text-blue-400">℃</span>
+                            </span>
                         </div>
 
-                        <div class="mb-4 group text-sm" style="color: #06b6d4;">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-medium text-slate-500 flex items-center gap-1.5 transition-colors group-hover:text-slate-700">
-                                    <span class="p-1 rounded bg-slate-100 text-cyan-500"><i data-lucide="droplets" class="w-3.5 h-3.5"></i></span>
-                                    pH值
-                                </label>
-                                <span id="val_ph" class="text-xs font-mono font-medium px-2 py-0.5 rounded border border-slate-200 bg-slate-50 transition-colors text-cyan-500">7.5</span>
-                            </div>
-                            <input type="range" id="ph" min="5" max="10" step="0.1" value="7.5" class="text-cyan-500" oninput="updateValues()">
+                        <div class="mb-5 flex justify-between items-center group">
+                            <label class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                <span class="p-1.5 rounded-md bg-cyan-50 text-cyan-600 border border-cyan-100"><i data-lucide="droplets" class="w-4 h-4"></i></span>
+                                pH值
+                            </label>
+                            <span class="text-sm font-mono font-bold px-2 py-1 rounded-md border border-cyan-200 bg-cyan-50 text-cyan-700 shadow-sm min-w-[70px] text-right">
+                                <span id="val_ph">7.5</span>
+                            </span>
                         </div>
 
-                        <div class="mb-4 group text-sm" style="color: #14b8a6;">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-medium text-slate-500 flex items-center gap-1.5 transition-colors group-hover:text-slate-700">
-                                    <span class="p-1 rounded bg-slate-100 text-teal-500"><i data-lucide="activity" class="w-3.5 h-3.5"></i></span>
-                                    溶氧量 (mg/L)
-                                </label>
-                                <span id="val_do" class="text-xs font-mono font-medium px-2 py-0.5 rounded border border-slate-200 bg-slate-50 transition-colors text-teal-500">6.5</span>
-                            </div>
-                            <input type="range" id="doValue" min="2" max="12" step="0.1" value="6.5" class="text-teal-500" oninput="updateValues()">
+                        <div class="mb-5 flex justify-between items-center group">
+                            <label class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                <span class="p-1.5 rounded-md bg-teal-50 text-teal-600 border border-teal-100"><i data-lucide="waves" class="w-4 h-4"></i></span>
+                                溶氧量
+                            </label>
+                            <span class="text-sm font-mono font-bold px-2 py-1 rounded-md border border-teal-200 bg-teal-50 text-teal-700 shadow-sm min-w-[70px] text-right">
+                                <span id="val_do">6.5</span> <span class="text-[10px] text-teal-400">mg/L</span>
+                            </span>
                         </div>
                     </div>
-                    <div>
-                        <h3 class="text-xs font-medium text-slate-400 mb-4 tracking-wider uppercase">行为视觉提取模块</h3>
 
-                        <div class="mb-4 group text-sm" style="color: #f97316;">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-medium text-slate-500 flex items-center gap-1.5 transition-colors group-hover:text-slate-700">
-                                    <span class="p-1 rounded bg-slate-100 text-orange-500"><i data-lucide="percent" class="w-3.5 h-3.5"></i></span>
-                                    残饵量 (%)
-                                </label>
-                                <span id="val_leftover" class="text-xs font-mono font-medium px-2 py-0.5 rounded border border-slate-200 bg-slate-50 transition-colors text-orange-500">15</span>
-                            </div>
-                            <input type="range" id="leftover" min="0" max="100" step="1" value="15" class="text-orange-500" oninput="updateValues()">
+                    <div class="pt-4 border-t border-slate-100">
+                        <h3 class="text-xs font-bold text-slate-400 mb-4 tracking-wider uppercase">行为视觉提取</h3>
+                        
+                        <div class="mb-5 flex justify-between items-center group">
+                            <label class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                <span class="p-1.5 rounded-md bg-orange-50 text-orange-600 border border-orange-100"><i data-lucide="percent" class="w-4 h-4"></i></span>
+                                残饵量
+                            </label>
+                            <span class="text-sm font-mono font-bold px-2 py-1 rounded-md border border-orange-200 bg-orange-50 text-orange-700 shadow-sm min-w-[70px] text-right">
+                                <span id="val_leftover">15</span> <span class="text-[10px] text-orange-400">%</span>
+                            </span>
                         </div>
 
-                        <div class="mb-4 group text-sm" style="color: #10b981;">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-medium text-slate-500 flex items-center gap-1.5 transition-colors group-hover:text-slate-700">
-                                    <span class="p-1 rounded bg-slate-100 text-emerald-500"><i data-lucide="fish" class="w-3.5 h-3.5"></i></span>
-                                    平均活跃度 (0-10)
-                                </label>
-                                <span id="val_activity" class="text-xs font-mono font-medium px-2 py-0.5 rounded border border-slate-200 bg-slate-50 transition-colors text-emerald-500">8</span>
-                            </div>
-                            <input type="range" id="activity" min="0" max="10" step="1" value="8" class="text-emerald-500" oninput="updateValues()">
+                        <div class="mb-5 flex justify-between items-center group">
+                            <label class="text-sm font-medium text-slate-600 flex items-center gap-2">
+                                <span class="p-1.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100"><i data-lucide="fish" class="w-4 h-4"></i></span>
+                                活跃度
+                            </label>
+                            <span class="text-sm font-mono font-bold px-2 py-1 rounded-md border border-emerald-200 bg-emerald-50 text-emerald-700 shadow-sm min-w-[70px] text-right">
+                                <span id="val_activity">80</span> <span class="text-[10px] text-emerald-400">/100</span>
+                            </span>
                         </div>
                     </div>
+                </div>
+                
+                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 mt-2 flex items-center justify-between shadow-inner relative overflow-hidden">
+                    <div class="absolute -right-3 -bottom-6 opacity-10 text-emerald-600">
+                        <i data-lucide="cpu" class="w-24 h-24"></i>
+                    </div>
+                    <div class="text-emerald-800 font-bold text-sm z-10 w-full text-left">最终模型输出</div>
+                    <div class="flex items-baseline gap-1 z-10 w-full justify-end">
+                        <span id="final_pred" class="text-4xl font-black font-mono text-emerald-600 transition-transform duration-200">0</span>
+                        <span class="text-emerald-600 font-bold text-sm">g/m²</span>
+                    </div>
+                </div>
+
+                <!-- Control Center -->
+                <div class="mt-4 pt-6 border-t border-slate-100 bg-slate-50 -mx-6 -mb-6 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-semibold text-slate-700">模型状态:</span>
+                        <span id="status_indicator" class="text-sm font-bold text-slate-400 flex items-center gap-1.5 transition-colors">
+                            <span id="status_dot" class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block shadow-inner"></span>
+                            <span id="status_text">待机中</span>
+                        </span>
+                    </div>
+                    <button id="btn_start" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none">
+                        <i data-lucide="play" class="w-5 h-5"></i> 在线运行模型
+                    </button>
+                    <button id="btn_stop" class="w-full py-3 px-4 bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 rounded-xl font-bold transition-all items-center justify-center gap-2 hidden mt-3 shadow-sm">
+                        <i data-lucide="square" class="w-4 h-4"></i> 停止运行
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="xl:col-span-9 bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm relative">
-            <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 to-green-400"></div>
-
-            <h2 class="text-2xl font-semibold text-slate-800 flex items-center gap-2 mb-8 border-b border-slate-100 pb-4">
-                <i data-lucide="git-branch" class="text-emerald-500 w-6 h-6"></i> 森林内部全景 (The Forest Ensemble)
+        <!-- Extensive Forest Simulation -->
+        <div class="xl:col-span-9 bg-white border border-slate-200 rounded-2xl p-6 md:p-8 flex flex-col shadow-md relative overflow-hidden">
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 relative z-10">
+                <i data-lucide="git-branch" class="text-indigo-500 w-5 h-5"></i> 并发子模型
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" id="trees-container">
-               </div>
+            <!-- Scrollable container for 100 trees -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8 relative z-10 overflow-y-auto max-h-[60vh] pr-2 scroll-smooth" id="trees-container" style="scrollbar-width: thin;">
+               <!-- Injected via JS -->
+            </div>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                <div class="absolute inset-x-0 -bottom-24 h-48 bg-emerald-500/10 blur-3xl rounded-full pointer-events-none"></div>
-
-                <div class="flex-1">
-                    <h3 class="text-lg font-medium text-slate-800 mb-2">集成平均 (Ensemble Averaging)</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">
-                        每棵树因为只能看到“部分特征”，做出的决策都是“偏科”的弱分类器。将所有树走到最终叶子节点的值取平均，就是随机森林防止单点过拟合、提升鲁棒性的终极原理！
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-2 border-l border-slate-200 pl-8 z-10 w-full md:w-auto justify-center">
-                    <div class="text-center w-36 shrink-0">
-                        <div id="tree_sum_text" class="text-emerald-600 font-mono text-sm mb-1 whitespace-nowrap">0 + 0 + 0</div>
-                        <div class="text-slate-300 text-xs">━━━━━━━━━━━━━━</div>
-                        <div class="text-slate-400 font-mono text-xs mt-1">3 Trees</div>
+            <!-- Aggregation area -->
+            <div class="mt-auto relative z-10 h-[220px]">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex flex-col shadow-sm relative h-full overflow-hidden">
+                    <div class="flex justify-between items-end mb-2 relative z-10">
+                        <h3 class="text-sm font-bold text-indigo-900 flex items-center gap-2">
+                            <i data-lucide="trending-up" class="w-4 h-4 text-indigo-600"></i>
+                            最终决策集成输出曲线
+                        </h3>
+                        <div id="tree_sum_text" class="text-xs text-indigo-400 hidden"></div>
                     </div>
-                    <div class="text-slate-400 font-bold text-2xl w-6 text-center shrink-0">=</div>
-                    <div class="flex items-baseline justify-start gap-1 w-36 shrink-0">
-                        <div id="final_pred" class="text-5xl font-bold font-mono tracking-tighter text-slate-800 text-right w-24 shrink-0" style="transition: transform 0.2s, color 0.2s;">
-                            0
-                        </div>
-                        <span class="text-emerald-600 font-medium">g/m²</span>
+                    <div class="flex-1 w-full relative z-10">
+                        <canvas id="outputChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -153,40 +146,126 @@
 </div>
 
 <script>
-    // 【修改点】增加断网安全检测：如果加载不到外部的lucide图标库，直接跳过，不阻断后续树的生成
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    lucide.createIcons();
+
+    const outputChartCtx = document.getElementById('outputChart').getContext('2d');
+    const outputChart = new Chart(outputChartCtx, {
+        type: 'line',
+        data: {
+            labels: Array(30).fill(''),
+            datasets: [
+                {
+                    label: '投喂量(g/m²)',
+                    data: Array(30).fill(null),
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '活跃度(%)',
+                    data: Array(30).fill(null),
+                    borderColor: '#10b981',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: '残饵量(%)',
+                    data: Array(30).fill(null),
+                    borderColor: '#f97316',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 12, usePointStyle: true, font: {size: 10} } }, 
+                tooltip: { enabled: false } 
+            },
+            scales: {
+                x: { display: false },
+                y: { 
+                    type: 'linear',
+                    display: true, 
+                    position: 'left',
+                    min: 20, 
+                    max: 150, 
+                    border: { display: false },
+                    grid: { color: 'rgba(99, 102, 241, 0.1)', borderDash: [4, 4] },
+                    ticks: { color: '#4f46e5', font: { size: 10, family: 'monospace' }, stepSize: 30 },
+                    title: { display: true, text: '投喂量(g/m²)', font: {size: 10}, color: '#4f46e5' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    min: 0,
+                    max: 100,
+                    border: { display: false },
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#64748b', font: { size: 10, family: 'monospace' }, stepSize: 25 },
+                    title: { display: true, text: '百分比(%)', font: {size: 10}, color: '#64748b' }
+                }
+            },
+            animation: { duration: 400, easing: 'linear' }
+        }
+    });
+
+    let isChartInit = false;
+
+    // Definitions for 100 parallel Decision Trees manually generated
+    const featuresList = [
+        { id: 'temp', name: '水温', min: 10, max: 35, unit: '℃' },
+        { id: 'ph', name: 'pH', min: 6.0, max: 9.0, unit: '' },
+        { id: 'doValue', name: '溶氧', min: 3, max: 10, unit: 'mg/L' },
+        { id: 'leftover', name: '残饵', min: 0, max: 50, unit: '%' },
+        { id: 'activity', name: '活跃', min: 0, max: 100, unit: '' }
+    ];
+
+    function getWeightedFeature() {
+        const r = Math.random();
+        // 赋予残饵和活跃度更高的权重 (40% + 40%)，使得模型对这两个特征极为敏感
+        if (r < 0.40) return featuresList[3]; // 残饵
+        if (r < 0.80) return featuresList[4]; // 活跃度
+        if (r < 0.88) return featuresList[0]; // 水温
+        if (r < 0.94) return featuresList[1]; // pH
+        return featuresList[2]; // 溶氧
     }
 
-    const t1Nodes = [
-        { id: 0, text: "水温≥20℃", x: 150, y: 20 },
-        { id: 1, text: "pH在6.5~8.5", x: 75, y: 75 },
-        { id: 2, text: "pH在6.5~8.5", x: 225, y: 75 },
-        { id: 3, text: "120g", x: 37, y: 130, isLeaf: true },
-        { id: 4, text: "60g", x: 113, y: 130, isLeaf: true },
-        { id: 5, text: "70g", x: 187, y: 130, isLeaf: true },
-        { id: 6, text: "30g", x: 263, y: 130, isLeaf: true }
-    ];
-
-    const t2Nodes = [
-        { id: 0, text: "溶氧≥6.0", x: 150, y: 20 },
-        { id: 1, text: "残饵≤20%", x: 75, y: 75 },
-        { id: 2, text: "残饵≤10%", x: 225, y: 75 },
-        { id: 3, text: "120g", x: 37, y: 130, isLeaf: true },
-        { id: 4, text: "50g", x: 113, y: 130, isLeaf: true },
-        { id: 5, text: "40g", x: 187, y: 130, isLeaf: true },
-        { id: 6, text: "0g", x: 263, y: 130, isLeaf: true }
-    ];
-
-    const t3Nodes = [
-        { id: 0, text: "残饵≤15%", x: 150, y: 20 },
-        { id: 1, text: "活跃≥6", x: 75, y: 75 },
-        { id: 2, text: "活跃<4", x: 225, y: 75 },
-        { id: 3, text: "150g", x: 37, y: 130, isLeaf: true },
-        { id: 4, text: "80g", x: 113, y: 130, isLeaf: true },
-        { id: 5, text: "0g", x: 187, y: 130, isLeaf: true },
-        { id: 6, text: "40g", x: 263, y: 130, isLeaf: true }
-    ];
+    // Function to generate a semi-random plausible decision tree node split condition
+    function genCond() {
+        const feat = getWeightedFeature();
+        // Make nice rounded thresholds
+        let threshold = (Math.random() * (feat.max - feat.min) + feat.min).toFixed(1);
+        if (feat.id === 'leftover' || feat.id === 'activity') threshold = Math.round(threshold);
+        
+        // Logical rule: left branch (true) means "good condition -> more feed"
+        let isGreater = true;
+        if (feat.id === 'leftover') isGreater = false; // less leftover = better
+        
+        const operatorStr = isGreater ? '≥' : '<';
+        
+        return {
+            featId: feat.id,
+            text: `${feat.name}${operatorStr}${threshold}`,
+            operator: isGreater ? '>=' : '<',
+            val: parseFloat(threshold),
+            rawFeatName: feat.name
+        }
+    }
 
     function createTreeSVG(tid, nodes) {
         const edges = [
@@ -201,16 +280,16 @@
         let edgeHTML = edges.map(e => {
             const n1 = nodes[e.from];
             const n2 = nodes[e.to];
-            return `<line id="${e.id}" x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="#cbd5e1" stroke-width="1.5" class="edge" />`;
+            return `<line id="${e.id}" x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="#e2e8f0" stroke-width="1.5" class="edge" />`;
         }).join('');
 
         let nodeHTML = nodes.map(n => {
-            const w = n.isLeaf ? 46 : 66;
-            const h = n.isLeaf ? 24 : 26;
+            const w = n.isLeaf ? 46 : 64;
+            const h = n.isLeaf ? 24 : 24;
             return `
             <g transform="translate(${n.x - w/2}, ${n.y - h/2})">
-                <rect id="n${tid}-${n.id}" width="${w}" height="${h}" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" class="node-rect" />
-                <text id="t${tid}-${n.id}" x="${w/2}" y="${h/2 + 3}" text-anchor="middle" font-size="10" fill="#64748b" class="node-text">${n.text}</text>
+                <rect id="n${tid}-${n.id}" width="${w}" height="${h}" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" class="node-rect shadow-sm" />
+                <text id="t${tid}-${n.id}" x="${w/2}" y="${h/2 + 3.5}" text-anchor="middle" font-size="10" fill="#64748b" class="node-text font-sans font-medium">${n.text}</text>
             </g>
             `;
         }).join('');
@@ -224,19 +303,43 @@
     }
 
     const treesContainer = document.getElementById('trees-container');
-    const treesConfig = [
-        { id: 1, name: "决策树 #1", msg: "随机分配特征：[水温, pH值]", nodes: t1Nodes },
-        { id: 2, name: "决策树 #2", msg: "随机分配特征：[残饵, 溶氧]", nodes: t2Nodes },
-        { id: 3, name: "决策树 #3", msg: "进食意愿专家：[残饵, 活跃]", nodes: t3Nodes }
-    ];
+    const treesConfig = [];
+    
+    // Generate 100 Trees
+    for (let i = 1; i <= 100; i++) {
+        const c0 = genCond();
+        const c1 = genCond();
+        const c2 = genCond();
+        
+        // Ensure some logical outcomes (higher temperature/activity = more feed, higher leftovers = less feed, etc.)
+        // 放大叶子节点的差异，让最终结果随特征变动大幅度波动
+        const leafBase = Math.floor(Math.random() * 20) + 30; // 30 ~ 50
+        
+        const nodes = [
+            { id: 0, text: c0.text, cond: c0, x: 150, y: 20 },
+            { id: 1, text: c1.text, cond: c1, x: 75, y: 75 },
+            { id: 2, text: c2.text, cond: c2, x: 225, y: 75 },
+            { id: 3, text: `${leafBase + 75}g`, res: leafBase + 75, x: 37, y: 130, isLeaf: true }, // 都优：大增
+            { id: 4, text: `${leafBase + 40}g`, res: leafBase + 40, x: 113, y: 130, isLeaf: true }, // 一优一劣
+            { id: 5, text: `${leafBase + 15}g`, res: leafBase + 15, x: 187, y: 130, isLeaf: true }, // 一劣一优
+            { id: 6, text: `${Math.max(5, leafBase - 15)}g`, res: Math.max(5, leafBase - 15), x: 263, y: 130, isLeaf: true } // 都劣：大减
+        ];
+        
+        treesConfig.push({
+            id: i,
+            name: `决策树 #${i}`,
+            msg: `特征: [${c0.rawFeatName}, ${c1.rawFeatName}, ${c2.rawFeatName}]`,
+            nodes: nodes
+        });
+    }
 
     treesConfig.forEach(t => {
         const div = document.createElement('div');
-        div.className = "bg-white border border-slate-200 rounded-xl p-4 flex flex-col relative shadow-sm";
+        div.className = "bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col relative shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)]";
         div.innerHTML = `
-            <div class="text-center mb-4">
-                <h3 class="text-slate-800 font-medium text-sm">${t.name}</h3>
-                <p class="text-[10px] text-emerald-600 mt-1 uppercase tracking-wider">${t.msg}</p>
+            <div class="text-center mb-3">
+                <h3 class="text-slate-700 font-bold text-xs tracking-tight">${t.name}</h3>
+                <p class="text-[9px] text-indigo-500/80 font-semibold mt-0.5 tracking-wider truncate" title="${t.msg}">${t.msg}</p>
             </div>
             <div class="relative w-full aspect-[300/170] flex-1">
                 ${createTreeSVG(t.id, t.nodes)}
@@ -256,14 +359,14 @@
             }
             if(text) {
                 text.setAttribute('fill', '#64748b');
-                text.setAttribute('font-weight', 'normal');
+                text.setAttribute('font-weight', '500');
             }
         }
-
+        
         ['0-1', '0-2', '1-3', '1-4', '2-5', '2-6'].forEach(edge => {
             const el = document.getElementById(`e${tid}-${edge}`);
             if(el) {
-                el.setAttribute('stroke', '#cbd5e1');
+                el.setAttribute('stroke', '#e2e8f0');
                 el.setAttribute('stroke-width', '1.5');
             }
         });
@@ -271,7 +374,7 @@
         activeEdges.forEach(edge => {
             const el = document.getElementById(`e${tid}-${edge}`);
             if(el) {
-                el.setAttribute('stroke', '#10b981');
+                el.setAttribute('stroke', '#10b981'); // emerald-500
                 el.setAttribute('stroke-width', '3');
             }
         });
@@ -281,89 +384,172 @@
             const text = document.getElementById(`t${tid}-${nodeId}`);
             const isLeaf = [3,4,5,6].includes(nodeId);
             if(rect) {
-                rect.setAttribute('fill', isLeaf ? '#10b981' : '#ffffff');
-                rect.setAttribute('stroke', isLeaf ? '#059669' : '#10b981');
+                rect.setAttribute('fill', isLeaf ? '#10b981' : '#ecfdf5'); // leaf bg emerald-500, node bg emerald-50
+                rect.setAttribute('stroke', '#10b981'); // emerald-500
                 rect.setAttribute('stroke-width', '2');
             }
             if(text) {
-                text.setAttribute('fill', isLeaf ? '#ffffff' : '#059669');
-                text.setAttribute('font-weight', '600');
+                text.setAttribute('fill', isLeaf ? '#ffffff' : '#047857'); // leaf text white, node text emerald-700
+                text.setAttribute('font-weight', '700');
             }
         });
     }
 
+    // Evaluation logic
+    function evalCond(cond, actualVals) {
+        const val = actualVals[cond.featId];
+        if (cond.operator === '>=') return val >= cond.val;
+        return val < cond.val;
+    }
+
     let lastFinal = 0;
 
-    function updateValues() {
-        const temp = parseFloat(document.getElementById('temp').value);
-        const ph = parseFloat(document.getElementById('ph').value);
-        const doValue = parseFloat(document.getElementById('doValue').value);
-        const leftover = parseFloat(document.getElementById('leftover').value);
-        const activity = parseFloat(document.getElementById('activity').value);
+    function evaluateModel(envData) {
+        const results = [];
+        
+        treesConfig.forEach(tree => {
+            const nodes = tree.nodes;
+            let a = [0], e = [], res = 0;
+            
+            if (evalCond(nodes[0].cond, envData)) {
+                e.push('0-1'); a.push(1);
+                if (evalCond(nodes[1].cond, envData)) { e.push('1-3'); a.push(3); res = nodes[3].res; } 
+                else { e.push('1-4'); a.push(4); res = nodes[4].res; }
+            } else {
+                e.push('0-2'); a.push(2);
+                if (evalCond(nodes[2].cond, envData)) { e.push('2-5'); a.push(5); res = nodes[5].res; } 
+                else { e.push('2-6'); a.push(6); res = nodes[6].res; }
+            }
+            
+            updateTreeState(tree.id, a, e);
+            results.push(res);
+        });
 
-        document.getElementById('val_temp').innerText = temp;
-        document.getElementById('val_ph').innerText = ph;
-        document.getElementById('val_do').innerText = doValue;
-        document.getElementById('val_leftover').innerText = leftover;
-        document.getElementById('val_activity').innerText = activity;
-
-        // T1
-        let a1 = [0], e1 = [], r1 = 0;
-        if (temp >= 20) {
-            e1.push('0-1'); a1.push(1);
-            if (ph >= 6.5 && ph <= 8.5) { e1.push('1-3'); a1.push(3); r1 = 120; }
-            else { e1.push('1-4'); a1.push(4); r1 = 60; }
-        } else {
-            e1.push('0-2'); a1.push(2);
-            if (ph >= 6.5 && ph <= 8.5) { e1.push('2-5'); a1.push(5); r1 = 70; }
-            else { e1.push('2-6'); a1.push(6); r1 = 30; }
-        }
-        updateTreeState(1, a1, e1);
-
-        // T2
-        let a2 = [0], e2 = [], r2 = 0;
-        if (doValue >= 6.0) {
-            e2.push('0-1'); a2.push(1);
-            if (leftover <= 20) { e2.push('1-3'); a2.push(3); r2 = 120; }
-            else { e2.push('1-4'); a2.push(4); r2 = 50; }
-        } else {
-            e2.push('0-2'); a2.push(2);
-            if (leftover <= 10) { e2.push('2-5'); a2.push(5); r2 = 40; }
-            else { e2.push('2-6'); a2.push(6); r2 = 0; }
-        }
-        updateTreeState(2, a2, e2);
-
-        // T3
-        let a3 = [0], e3 = [], r3 = 0;
-        if (leftover <= 15) {
-            e3.push('0-1'); a3.push(1);
-            if (activity >= 6) { e3.push('1-3'); a3.push(3); r3 = 150; }
-            else { e3.push('1-4'); a3.push(4); r3 = 80; }
-        } else {
-            e3.push('0-2'); a3.push(2);
-            if (activity < 4) { e3.push('2-5'); a3.push(5); r3 = 0; }
-            else { e3.push('2-6'); a3.push(6); r3 = 40; }
-        }
-        updateTreeState(3, a3, e3);
-
-        document.getElementById('tree_sum_text').innerText = `${r1} + ${r2} + ${r3}`;
-        const finalPrediction = Math.round((r1 + r2 + r3) / 3);
-
+        document.getElementById('tree_sum_text').innerText = results.join(' + ');
+        
+        // Final aggregate math
+        const finalVal = Math.round(results.reduce((a,b)=>a+b, 0) / 100);
+        
         const finalEl = document.getElementById('final_pred');
-        finalEl.innerText = finalPrediction;
+        finalEl.innerText = finalVal;
 
-        if(finalPrediction !== lastFinal) {
-            finalEl.style.transform = 'scale(1.2)';
-            finalEl.style.color = '#10b981';
+        if (!isChartInit) {
+            outputChart.data.datasets[0].data = Array(30).fill(finalVal);
+            outputChart.data.datasets[1].data = Array(30).fill(envData.activity);
+            outputChart.data.datasets[2].data = Array(30).fill(envData.leftover);
+            isChartInit = true;
+        } else {
+            outputChart.data.datasets[0].data.push(finalVal);
+            outputChart.data.datasets[0].data.shift();
+            
+            outputChart.data.datasets[1].data.push(envData.activity);
+            outputChart.data.datasets[1].data.shift();
+            
+            outputChart.data.datasets[2].data.push(envData.leftover);
+            outputChart.data.datasets[2].data.shift();
+        }
+        outputChart.update('none');
+        
+        if(finalVal !== lastFinal) {
+            finalEl.style.transform = 'scale(1.1)';
+            finalEl.style.color = '#047857'; // emerald-700
             setTimeout(() => {
                 finalEl.style.transform = 'scale(1)';
-                finalEl.style.color = '#1e293b';
-            }, 200);
-            lastFinal = finalPrediction;
+                finalEl.style.color = '#059669'; // text-emerald-600
+            }, 250);
+            lastFinal = finalVal;
         }
     }
 
-    updateValues();
+    // Interactive Testing Logic
+    let isTesting = false;
+    let simulationInterval = null;
+    let tickPhase = 0;
+    
+    // Initial State
+    let currentEnv = {
+        temp: 24.0,
+        ph: 7.5,
+        doValue: 6.5,
+        leftover: 15,
+        activity: 80
+    };
+
+    function updateUIValues() {
+        document.getElementById('val_temp').innerText = currentEnv.temp.toFixed(1);
+        document.getElementById('val_ph').innerText = currentEnv.ph.toFixed(1);
+        document.getElementById('val_do').innerText = currentEnv.doValue.toFixed(1);
+        document.getElementById('val_leftover').innerText = currentEnv.leftover.toFixed(0);
+        document.getElementById('val_activity').innerText = currentEnv.activity.toFixed(0);
+    }
+
+    function generateRandomChange(current, min, max, step) {
+        const change = (Math.random() - 0.5) * step;
+        let next = current + change;
+        if (next < min) next = min;
+        if (next > max) next = max;
+        return next;
+    }
+
+    const btnStart = document.getElementById('btn_start');
+    const btnStop = document.getElementById('btn_stop');
+    const statusText = document.getElementById('status_text');
+    const statusDot = document.getElementById('status_dot');
+
+    btnStart.addEventListener('click', () => {
+        isTesting = true;
+        btnStart.classList.add('hidden');
+        btnStop.classList.remove('hidden');
+        btnStop.classList.add('flex');
+        
+        statusText.innerText = "数据实时采集推演中...";
+        statusText.classList.add('text-emerald-600');
+        statusDot.classList.add('bg-emerald-500', 'animate-pulse');
+        statusDot.classList.remove('bg-slate-300');
+
+        simulationInterval = setInterval(() => {
+            tickPhase += 0.15; // smooth pace
+            
+            // Simulate the principle: high leftover & low activity -> low feed | low leftover & high activity -> high feed
+            const cycle = Math.sin(tickPhase); // -1 to 1
+            
+            const targetActivity = 50 + cycle * 40; // smoothly between 10 and 90
+            const targetLeftover = 25 - cycle * 20; // smoothly between 5 and 45
+            
+            currentEnv.activity += (targetActivity - currentEnv.activity) * 0.4;
+            currentEnv.leftover += (targetLeftover - currentEnv.leftover) * 0.4;
+
+            currentEnv.temp = generateRandomChange(currentEnv.temp, 22, 26, 0.5); // lower fluctuation
+            currentEnv.ph = generateRandomChange(currentEnv.ph, 7.0, 8.0, 0.1); // lower fluctuation
+            currentEnv.doValue = generateRandomChange(currentEnv.doValue, 6.0, 7.5, 0.2); // lower fluctuation
+            
+            updateUIValues();
+            evaluateModel(currentEnv);
+        }, 1200); // slightly faster test interval to draw curve smoothly
+        
+        updateUIValues();
+        evaluateModel(currentEnv); // Initial evaluation
+    });
+
+    btnStop.addEventListener('click', () => {
+        isTesting = false;
+        clearInterval(simulationInterval);
+        
+        btnStop.classList.add('hidden');
+        btnStop.classList.remove('flex');
+        btnStart.classList.remove('hidden');
+        btnStart.classList.add('flex');
+        
+        statusText.innerText = "测试已停止";
+        statusText.classList.remove('text-emerald-600');
+        statusDot.classList.remove('bg-emerald-500', 'animate-pulse');
+        statusDot.classList.add('bg-slate-300');
+    });
+
+    // Run one default evaluation
+    updateUIValues();
+    evaluateModel(currentEnv);
+
 </script>
 
 </body>
