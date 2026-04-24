@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>水质预警：孤立森林（Isolation Forest）直观演示</title>
+    <title>水质预警模型</title>
     <style>
         :root {
             --bg: #F1F5F9;
@@ -237,7 +237,7 @@
 <body>
 
     <div id="left-panel">
-        <h1>孤立森林原理解析</h1>
+        <h1>孤立森林算法</h1>
 
         <div style="display: flex; gap: 8px; margin-bottom: 16px;">
             <span class="param-badge">🌲 n_estimators = 100</span>
@@ -284,7 +284,7 @@
                 <div id="scoreBar" style="position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: var(--primary); transition: width 0.1s linear;"></div>
             </div>
 
-            <button id="btnLive" onclick="startLiveSim()" style="margin-top: 12px; width: 100%; background: #1E293B;">模拟水质缓慢恶化</button>
+            <button id="btnLive" onclick="startLiveSim()" style="margin-top: 12px; width: 100%; background: #1E293B;">模型测试</button>
         </div>
     </div>
 
